@@ -2,14 +2,14 @@ import { db } from "../connect.js"
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 export const register=(req,res)=>{
-    const q="SELECT * FROM users where username=?"
+    const q="SELECT * FROM user where username=?"
     db.query(q,[req.body.username],(err,data)=>{
         if(err) return res.status(500).json(err)
         if(data.length) return res.status(409).json("User already exists!")
         console.log(req.body.password)
         const salt=bcrypt.genSaltSync(10);
   const hashPassword=bcrypt.hashSync(req.body.password,salt)
-   const q="INSERT INTO users(username,email,password,name) VALUE (?)"
+   const q="INSERT INTO user(username,emailid,password,name) VALUE (?)"
    const values=[req.body.username,req.body.email,hashPassword,req.body.name]
    db.query(q,[values],(err,data)=>{
     if(err) return res.status(500).json(err)
@@ -21,7 +21,7 @@ export const register=(req,res)=>{
 
 }
 export const login=(req,res)=>{
-  const q="Select * from users where username=?"
+  const q="Select * from user where username=?"
   db.query(q,[req.body.username],(err,data)=>{
     if(err) return res.status(500).json(err)
         if(data.length===0) return res.status(404).json("User not found");
@@ -31,9 +31,12 @@ export const login=(req,res)=>{
       const{password,...others}=data[0];
       res.cookie("accessToken",token,{
         httpOnly:true,
-      }).status(200).json();
+      }).status(200).json(others);
   })
 }
 export const logout=(req,res)=>{
-    
+    res.clearCookie("accessToken",{
+        secure:true,
+        sameSite:"none"
+    }).status(200).json("User Logged Out")
 }
