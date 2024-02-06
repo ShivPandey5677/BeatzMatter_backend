@@ -1,18 +1,38 @@
 import {db} from "../connect.js"
 import jwt from "jsonwebtoken";
-// export const getPosts=(req,res)=>{
-//     const token=req.cookies.accessToken;
-//     if(!token) return res.status(401).json("Not logged in!");
-//     jwt.verify(token,"secretkey",(err,userInfo)=>{
-//         const q=`SELECT p.*,u.id AS userId,name,profilePic FROM posts AS p JOIN users AS u ON (u.id=p.userid) LEFT JOIN relationships AS r ON (p.userid=r.followedid) WHERE r.followerid=? OR p.userid=?`;
-//         console.log(userInfo)
-//         db.query(q,[userInfo.id,userInfo.id],(err,data)=>{
-//             if(err) return res.status(500).json(err);
-//             console.log(data);
-//             return res.status(200).json(data);
-//         })  
-//     })
-// }
+export const getProduct=(req,res)=>{
+    const token=req.cookies.accessToken;
+    if(!token) return res.status(401).json("Not logged in!");
+    jwt.verify(token,"secretkey",(err,userInfo)=>{
+        const q=`SELECT 
+        p.product_id AS product_id,
+        p.name AS product_name,
+        p.catogary AS product_category,
+        p.price AS product_price,
+        p.userid AS user_id,
+        p.quantity AS product_quantity,
+        p.location AS product_location,
+        p.imgURL AS product_imageURL,
+        u.id AS user_id,
+        u.username AS username,
+        u.emailid AS email,
+        u.name AS user_name,
+        u.city AS city
+    FROM 
+        product AS p
+    JOIN 
+        user AS u ON p.userid = u.id
+    WHERE 
+        p.userid = ?`;
+        console.log(userInfo)
+        db.query(q,[userInfo.id],(err,data)=>{
+            if(err) return res.status(500).json(err);
+            console.log(data);
+            return res.status(200).json(data);
+        })  
+    })
+}
+//SELECT p.*,u.id AS userId,name,profilePic FROM posts AS p JOIN users AS u ON (u.id=p.userid) LEFT JOIN relationships AS r ON (p.userid=r.followedid) WHERE r.followerid=? OR p.userid=?
 export const addPost=(req,res)=>{
     const token=req.cookies.accessToken;
     if(!token) return res.status(401).json("Not logged in!");
