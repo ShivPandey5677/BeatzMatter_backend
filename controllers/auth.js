@@ -6,11 +6,11 @@ export const register=(req,res)=>{
     db.query(q,[req.body.username],(err,data)=>{
         if(err) return res.status(500).json(err)
         if(data.length) return res.status(409).json("User already exists!")
-        console.log(req.body.password)
+        console.log(req.body)
         const salt=bcrypt.genSaltSync(10);
   const hashPassword=bcrypt.hashSync(req.body.password,salt)
-   const q="INSERT INTO user(username,emailid,password,name) VALUE (?)"
-   const values=[req.body.username,req.body.email,hashPassword,req.body.name]
+   const q="INSERT INTO user(username,email,password,name,mhp) VALUE (?)"
+   const values=[req.body.username,req.body.email,hashPassword,req.body.name,req.body.mhp]
    db.query(q,[values],(err,data)=>{
     if(err) return res.status(500).json(err)
     return res.status(200).json("User has been created");
